@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0b0c" />
+  <meta name="description" content="Lyans Plug — sélection streetwear, sneakers et pièces luxe. Trouvez votre prochaine pièce iconique." />
+  <title>LYANS PLUG — Streetwear & Luxe</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { color-scheme: dark; --ink: #0b0b0c; --panel: #141416; --muted: #a0a0a5; --line: rgba(255,255,255,.1); }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 92px; }
+    body { margin: 0; background: var(--ink); color: #fff; font-family: 'DM Sans', sans-serif; }
+    h1,h2,h3,.display { font-family: 'Space Grotesk', sans-serif; }
+    ::selection { background: #fff; color: #0b0b0c; }
+    .glass { background: rgba(11,11,12,.76); backdrop-filter: blur(18px); }
+    .marquee-track { width: max-content; animation: marquee-scroll 34s linear infinite; }
+    .marquee:hover .marquee-track { animation-play-state: paused; }
+    @media (max-width: 639px) { #productGrid { gap:1rem; } }
+    @media (min-width: 1024px) {
+      .header-row { position:relative; }
+      .header-search { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); }
+    }
+    .quickview-layer { opacity:0; visibility:hidden; transition: opacity .25s ease, visibility .25s ease; }
+    .quickview-layer.open { opacity:1; visibility:visible; }
+    .quickview-panel { opacity:0; transform:translateY(12px) scale(.98); transition: opacity .25s ease, transform .25s ease; }
+    .quickview-layer.open .quickview-panel { opacity:1; transform:translateY(0) scale(1); }
+    .quick-size.selected { color:#0b0b0c; background:#fff; border-color:#fff; }
+    .hero-grid { background-image: linear-gradient(90deg, #0b0b0c 0%, rgba(11,11,12,.92) 34%, rgba(11,11,12,.16) 100%), linear-gradient(0deg, #0b0b0c 0%, transparent 34%), url('Air%20jordan/Jordan%204%20Retro%20Black%20Cat.jpg'); background-size: cover; background-position: center 42%; }
+    .product-card { animation: rise .45s ease both; }
+    .product-card:hover .product-image { transform: scale(1.055); }
+    .product-card:hover { box-shadow: 0 22px 60px rgba(0,0,0,.42); }
+    .product-image { transition: transform .45s cubic-bezier(.2,.7,.2,1); }
+    .hide-scrollbar::-webkit-scrollbar { display:none; }
+    .hide-scrollbar { scrollbar-width:none; }
+    #cartDrawer.drawer { top:50%; right:auto; left:50%; width:min(92vw,620px); max-width:620px; height:min(84vh,780px); border:1px solid var(--line); border-radius:18px; transform:translate(-50%,-48%) scale(.98); transition:transform .32s cubic-bezier(.2,.8,.2,1); }
+    #cartDrawer.drawer.open { transform:translate(-50%,-50%) scale(1); }
+    .backdrop { opacity: 0; visibility: hidden; transition: opacity .25s, visibility .25s; }
+    .backdrop.open { opacity: 1; visibility: visible; }
+    .toast { transform: translateY(16px); opacity: 0; pointer-events:none; transition: .25s ease; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .category-button.active { color:#0b0b0c; background:#fff; border-color:#fff; }
+    .color-swatch { background: var(--swatch); box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+    .color-swatch.selected { outline: 1px solid #fff; outline-offset: 3px; box-shadow: 0 0 0 4px rgba(255,255,255,.08); }
+    .focus-ring:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+    @media (max-width: 767px) {
+      #cartDrawer.drawer {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-width: none;
+        height: min(88vh, 760px);
+        height: min(88dvh, 760px);
+        border-top: 1px solid var(--line);
+        border-left: 0;
+        border-radius: 18px 18px 0 0;
+        transform: translateY(102%);
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+      }
+      #cartDrawer.drawer.open { transform: translateY(0); }
+      #cartItems { min-height: 0; overscroll-behavior: contain; }
+      #cartFooter { flex-shrink: 0; padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
+      #quickViewLayer.quickview-layer,
+      #orderSummaryLayer.quickview-layer { place-items: end center; padding: 0; }
+      #quickViewDialog.quickview-panel,
+      #orderSummaryDialog.quickview-panel {
+        width: 100%;
+        max-width: none;
+        max-height: 92vh;
+        max-height: 92dvh;
+        border-radius: 18px 18px 0 0;
+        transform: translateY(100%);
+        opacity: 1;
+        padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
+      }
+      #quickViewLayer.open #quickViewDialog,
+      #orderSummaryLayer.open #orderSummaryDialog { transform: translateY(0); }
+      #quickViewDialog { grid-template-columns: minmax(0, 1fr); }
+      #quickViewDialog > div:first-child { min-height: clamp(210px, 34dvh, 300px); }
+    }
+    @keyframes rise { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes marquee-scroll { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; transition-duration:.01ms !important; } }
+  </style>
+</head>
+<body>
+  <div class="marquee overflow-hidden border-b border-white/10 bg-white/[0.035] py-2.5" aria-label="100% Authentique · Sélection exclusive · Le vrai Plug · Livraison rapide">
+    <div class="marquee-track flex items-center" aria-hidden="true"><div class="flex shrink-0 items-center">
+      <span class="px-5 text-[9px] font-semibold uppercase tracking-[.2em] text-white/70 sm:text-[10px]">100% Authentique <span class="px-4 text-white/30">✳</span> Sélection exclusive <span class="px-4 text-white/30">✳</span> Le vrai Plug <span class="px-4 text-white/30">✳</span> Order on Instagram <span class="px-4 text-white/30">✳</span></span>
+    </div><div class="flex shrink-0 items-center"><span class="px-5 text-[9px] font-semibold uppercase tracking-[.2em] text-white/70 sm:text-[10px]">100% Authentique <span class="px-4 text-white/30">✳</span> Sélection exclusive <span class="px-4 text-white/30">✳</span> Le vrai Plug <span class="px-4 text-white/30">✳</span> Order on Instagram <span class="px-4 text-white/30">✳</span></span></div></div>
+  </div>
+  <header class="glass sticky top-0 z-40 border-b border-white/10">
+    <div class="header-row mx-auto flex h-[72px] w-full max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-8 lg:px-12">
+      <div class="flex min-w-0 items-center gap-4 2xl:gap-6">
+        <a href="#accueil" class="focus-ring flex shrink-0 items-center gap-2" aria-label="Lyans Plug, accueil">
+          <span class="display text-[19px] font-bold tracking-[-.09em] sm:text-[22px]">LYANS<span class="text-white/45">PLUG</span></span><span class="text-lg" aria-hidden="true">🔌</span>
+        </a>
+        <nav class="hidden items-center font-semibold uppercase text-white/65 lg:flex lg:gap-1 lg:text-[9px] lg:tracking-normal xl:gap-4 xl:text-[10px] xl:tracking-[.12em] 2xl:gap-7 2xl:text-[11px]" aria-label="Navigation principale">
+          <a class="transition hover:text-white" href="#catalogue">Catalogue</a><a class="transition hover:text-white" href="#catalogue" data-quick-filter="NOUVEAU">Nouveautés</a><a class="transition hover:text-white" href="#catalogue" data-quick-filter="BEST-SELLER">Topsellers</a><a class="transition hover:text-white" href="#contact">Contact</a>
+        </nav>
+      </div>
+      <label class="header-search hidden h-10 w-48 items-center gap-2 border-b border-white/20 px-2 md:flex lg:w-40 xl:w-48" aria-label="Rechercher un produit">
+        <svg class="h-4 w-4 shrink-0 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        <input id="searchInput" class="w-full bg-transparent text-xs text-white outline-none placeholder:text-white/35" type="search" placeholder="Nom, marque..." autocomplete="off" />
+      </label>
+      <div class="header-actions flex items-center gap-2 sm:gap-3">
+        <button id="mobileSearchToggle" class="focus-ring grid h-10 w-10 place-items-center rounded-full text-white/80 hover:bg-white/10 md:hidden" aria-label="Afficher la recherche"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
+        <button id="cartOpen" class="focus-ring relative flex h-10 items-center gap-2 rounded-full border border-white/15 px-3 text-xs font-semibold transition hover:border-white/50 hover:bg-white/5" aria-label="Ouvrir le panier">
+          <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 4h2l2.2 11.1a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 2-1.6L22 8H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></svg>
+          <span class="hidden sm:inline">Panier</span><span id="cartCount" class="grid min-h-5 min-w-5 place-items-center rounded-full bg-white px-1 text-[10px] font-bold text-black">0</span>
+        </button>
+      </div>
+    </div>
+    <div id="mobileSearch" class="hidden border-t border-white/10 px-4 py-3 md:hidden"><label class="flex items-center gap-2 rounded-lg bg-white/[0.07] px-3 py-2.5"><svg class="h-4 w-4 text-white/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="mobileSearchInput" class="w-full bg-transparent text-sm outline-none placeholder:text-white/40" type="search" placeholder="Nom, marque..." autocomplete="off" /></label></div>
+  </header>
+
+  <main class="w-full max-w-[1440px] mx-auto px-6 lg:px-12">
+    <section id="accueil" class="w-full pt-4">
+      <div class="hero-grid relative isolate flex min-h-[490px] items-end overflow-hidden rounded-2xl border border-white/10 sm:min-h-[560px] lg:min-h-[620px]">
+        <div class="absolute right-6 top-6 hidden border border-white/20 bg-black/35 px-3 py-2 text-[9px] font-semibold uppercase tracking-[.22em] text-white/80 sm:block">Curated for the culture</div>
+        <div class="relative z-10 max-w-2xl px-6 pb-9 sm:px-10 sm:pb-12 lg:px-16 lg:pb-16">
+          <p class="mb-5 flex items-center gap-3 text-[10px] font-bold uppercase tracking-[.3em] text-white/65"><span class="h-px w-8 bg-white/60"></span>La sélection qui fait la différence</p>
+          <h1 class="display max-w-xl text-4xl font-bold leading-[.98] tracking-[-.065em] sm:text-6xl lg:text-[76px]">LE PLUG ULTIME <span class="text-white/45">STREETWEAR &amp; LUXE</span></h1>
+          <p class="mt-5 max-w-md text-sm leading-6 text-white/65 sm:text-base">Les pièces qui comptent. Sneakers, essentiels et signatures premium, sélectionnés pour vous.</p>
+          <div class="mt-8 flex flex-wrap items-center gap-4"><a href="#catalogue" class="focus-ring inline-flex h-12 items-center gap-3 rounded-full bg-white px-6 text-[11px] font-bold uppercase tracking-[.14em] text-black transition hover:brightness-90">Explorer le shop <span aria-hidden="true">↘</span></a><span class="text-[10px] uppercase tracking-[.14em] text-white/45">21 pièces sélectionnées</span></div>
+        </div>
+        <div class="absolute bottom-8 right-8 hidden items-center gap-3 text-right text-[9px] uppercase tracking-[.18em] text-white/55 xl:flex"><span>Édition<br/>sélection</span><span class="h-px w-12 bg-white/30"></span><span>01 / 04</span></div>
+      </div>
+    </section>
+
+    <section id="catalogue" class="w-full max-w-[1440px] mx-auto px-6 pb-20 pt-16 sm:pt-20 lg:px-12">
+      <div class="mb-7 flex flex-col justify-between gap-5 sm:mb-9 sm:flex-row sm:items-end">
+        <div><p class="mb-3 text-[10px] font-bold uppercase tracking-[.25em] text-white/45">Le meilleur du moment</p><h2 class="display text-3xl font-semibold tracking-[-.06em] sm:text-4xl">Le catalogue<span class="text-white/35">.</span></h2></div>
+        <p id="resultCount" class="text-xs text-white/45">21 pièces</p>
+      </div>
+      <div class="hide-scrollbar -mx-4 mb-7 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0" id="categoryFilters" aria-label="Filtrer par catégorie">
+        <button class="category-button active focus-ring shrink-0 rounded-full border border-white/15 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[.1em] transition hover:border-white/50" data-category="Tous">Tous</button>
+        <button class="category-button focus-ring shrink-0 rounded-full border border-white/15 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[.1em] text-white/65 transition hover:border-white/50 hover:text-white" data-category="Sneakers">Sneakers</button>
+        <button class="category-button focus-ring shrink-0 rounded-full border border-white/15 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[.1em] text-white/65 transition hover:border-white/50 hover:text-white" data-category="Hauts &amp; Sweats">Hauts &amp; Sweats</button>
+        <button class="category-button focus-ring shrink-0 rounded-full border border-white/15 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[.1em] text-white/65 transition hover:border-white/50 hover:text-white" data-category="Pantalons &amp; Bas">Pantalons &amp; Bas</button>
+        <button class="category-button focus-ring shrink-0 rounded-full border border-white/15 px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[.1em] text-white/65 transition hover:border-white/50 hover:text-white" data-category="Sacoches &amp; Accessoires">Sacoches &amp; Accessoires</button>
+      </div>
+      <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <label for="brandFilter" class="text-[9px] font-semibold uppercase tracking-[.18em] text-white/45">Filtrer par marque</label>
+        <select id="brandFilter" class="focus-ring h-10 w-full rounded-full border border-white/15 bg-[#141416] px-4 text-xs text-white/80 outline-none transition hover:border-white/40 sm:w-64">
+          <option value="Tous">Toutes les marques</option>
+        </select>
+      </div>
+      <div id="activeSearch" class="mb-5 hidden items-center gap-2 text-xs text-white/50"><span>Résultats pour</span><span id="searchTerm" class="font-semibold text-white"></span><button id="clearSearch" class="ml-1 underline underline-offset-4 hover:text-white">Effacer</button></div>
+      <div id="productGrid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8"></div>
+      <div id="emptyState" class="hidden rounded-2xl border border-dashed border-white/15 px-5 py-20 text-center"><p class="display text-xl font-semibold">Aucune pièce trouvée.</p><p class="mt-2 text-sm text-white/45">Essayez un autre terme ou une autre catégorie.</p><button id="resetFilters" class="mt-5 text-xs font-semibold uppercase tracking-widest underline underline-offset-4">Réinitialiser les filtres</button></div>
+    </section>
+
+    <section class="-mx-6 border-y border-white/10 bg-[#111113] lg:-mx-12">
+      <div class="mx-auto grid w-full max-w-[1440px] gap-8 px-4 py-12 sm:grid-cols-3 sm:px-8 sm:py-14 lg:px-12">
+        <div class="flex gap-4"><span class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/15 text-lg">↗</span><div><h3 class="text-sm font-semibold">Expédition rapide</h3><p class="mt-1 text-xs leading-5 text-white/45">On prépare votre commande avec soin et on vous tient informé.</p></div></div>
+        <div class="flex gap-4"><span class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/15 text-lg">✳</span><div><h3 class="text-sm font-semibold">Sélection premium</h3><p class="mt-1 text-xs leading-5 text-white/45">Des références streetwear et luxe choisies avec attention.</p></div></div>
+        <div class="flex gap-4"><span class="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/15 text-lg">↔</span><div><h3 class="text-sm font-semibold">Une question ?</h3><p class="mt-1 text-xs leading-5 text-white/45">Contactez-nous avant commande pour disponibilité et tailles.</p></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact" class="mx-auto w-full max-w-[1440px] px-4 py-12 sm:px-8 lg:px-12">
+    <div class="flex flex-col justify-between gap-8 border-b border-white/10 pb-10 sm:flex-row sm:items-end"><div><a href="#accueil" class="display text-xl font-bold tracking-[-.08em]">LYANS<span class="text-white/45">PLUG</span> 🔌</a><p class="mt-3 max-w-sm text-xs leading-5 text-white/45">Le bon plug pour les pièces qui ne passent pas inaperçues.</p></div><div><p class="mb-3 text-[9px] font-bold uppercase tracking-[.22em] text-white/45">Retrouvez-nous</p><div class="flex flex-wrap items-center gap-2"><a class="focus-ring grid h-10 w-10 place-items-center rounded-full border border-white/15 text-white/75 transition hover:border-white/50 hover:bg-white/5 hover:text-white" href="https://www.instagram.com/lyans_shopp?utm_source=ig_web_button_share_sheet&amp;obrf=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" aria-label="Instagram Lyans Plug" title="Instagram @lyans_shopp"><svg class="h-[19px] w-[19px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".75" fill="currentColor" stroke="none"/></svg></a><a class="rounded-full border border-white/15 px-4 py-2 text-xs text-white/75 transition hover:border-white/50 hover:text-white" href="https://www.snapchat.com/" target="_blank" rel="noopener noreferrer">Snapchat ↗</a><a class="rounded-full border border-white/15 px-4 py-2 text-xs text-white/75 transition hover:border-white/50 hover:text-white" href="https://telegram.org/" target="_blank" rel="noopener noreferrer">Telegram ↗</a></div></div></div>
+    <div class="flex flex-col justify-between gap-2 pt-5 text-[10px] text-white/35 sm:flex-row"><span>© <span id="year"></span> Lyans Plug. Tous droits réservés.</span><span>Les prix et disponibilités sont confirmés lors de la commande.</span></div>
+  </footer>
+
+  <div id="cartOverlay" class="backdrop fixed inset-0 z-50 bg-black/70 backdrop-blur-md" aria-hidden="true"></div>
+  <aside id="cartDrawer" class="drawer fixed right-0 top-0 z-[51] flex h-full w-full max-w-[460px] flex-col border-l border-white/10 bg-[#111113]" role="dialog" aria-modal="true" aria-labelledby="cartTitle" aria-hidden="true">
+    <div class="flex items-center justify-between border-b border-white/10 px-5 py-5 sm:px-7"><div><p class="text-[9px] font-bold uppercase tracking-[.2em] text-white/40">Votre sélection</p><h2 id="cartTitle" class="display mt-1 text-xl font-semibold">Le panier <span id="drawerCount" class="text-white/40">(0)</span></h2></div><button id="cartClose" type="button" onclick="closeCart()" class="focus-ring relative z-[60] pointer-events-auto grid h-10 w-10 place-items-center rounded-full border border-white/15 text-xl text-white/70 transition hover:bg-white/10" aria-label="Fermer le panier">×</button></div>
+    <div id="cartItems" class="flex-1 overflow-y-auto px-5 py-2 sm:px-7"></div>
+    <div id="cartFooter" class="border-t border-white/10 px-5 pb-6 pt-5 sm:px-7"><div class="mb-4 flex items-center justify-between"><span class="text-sm text-white/55">Sous-total</span><strong id="cartTotal" class="display text-lg">0 $</strong></div><p class="mb-4 text-[10px] leading-4 text-white/40">Le récapitulatif sera copié, puis Instagram s’ouvrira pour l’envoyer en DM.</p><button id="instagramCheckout" type="button" class="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white text-[11px] font-bold uppercase tracking-[.12em] text-black transition hover:brightness-90 disabled:pointer-events-none disabled:opacity-40" disabled><span>Commander sur Instagram</span><span aria-hidden="true">↗</span></button><a href="https://www.instagram.com/lyans_shopp?utm_source=ig_web_button_share_sheet&amp;obrf=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="mt-3 block text-center text-[10px] font-semibold uppercase tracking-[.12em] text-white/50 transition hover:text-white">@lyans_shopp ↗</a></div>
+  </aside>
+  <div id="quickViewLayer" class="quickview-layer fixed inset-0 z-[70] grid place-items-center p-3 sm:p-6" aria-hidden="true">
+    <button id="quickViewBackdrop" class="absolute inset-0 cursor-default bg-black/75 backdrop-blur-md" aria-label="Fermer la fiche produit" tabindex="-1"></button>
+    <section id="quickViewDialog" class="quickview-panel relative z-10 grid max-h-[92vh] w-full max-w-4xl overflow-y-auto rounded-2xl border border-white/10 bg-[#141416] shadow-2xl md:grid-cols-2" role="dialog" aria-modal="true" aria-labelledby="quickViewTitle" aria-hidden="true">
+      <div class="relative min-h-[280px] bg-[#101012] sm:min-h-[360px] md:min-h-[540px]"><div id="quickViewMedia" class="absolute inset-0 overflow-hidden"></div><span id="quickViewBadge" class="absolute left-4 top-4 rounded-full border border-white/15 bg-black/65 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.14em] backdrop-blur-sm"></span></div>
+      <div class="flex flex-col p-5 sm:p-8">
+        <div class="flex items-start justify-between gap-4"><div><p id="quickViewBrand" class="text-[10px] font-semibold uppercase tracking-[.2em] text-white/45"></p><h2 id="quickViewTitle" class="display mt-2 text-2xl font-semibold leading-tight tracking-[-.045em] sm:text-3xl"></h2></div><button id="quickViewClose" type="button" onclick="closeModal()" class="focus-ring relative z-[80] pointer-events-auto grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-white/75 transition hover:bg-white/10" aria-label="Fermer la fiche produit">×</button></div>
+        <p id="quickViewPrice" class="display mt-5 text-xl font-semibold"></p>
+        <div class="mt-8"><p class="mb-3 text-[9px] font-bold uppercase tracking-[.18em] text-white/45">Couleur <span id="quickViewSelectedColor" class="ml-1 font-normal normal-case tracking-normal text-white/75"></span></p><div id="quickViewColors" class="flex flex-wrap items-center gap-3" role="group" aria-label="Choisir une couleur"></div></div>
+        <div class="mt-7"><div class="mb-3 flex items-center justify-between"><p id="quickViewSizeLabel" class="text-[9px] font-bold uppercase tracking-[.18em] text-white/45">Choisir une taille</p><span class="text-[9px] text-white/35">Taille requise</span></div><div id="quickViewSizes" class="flex flex-wrap gap-2" role="group" aria-label="Choisir une taille"></div></div>
+        <div class="mt-auto pt-8"><button id="quickViewAdd" class="focus-ring flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-5 text-[10px] font-bold uppercase tracking-[.14em] text-black transition hover:brightness-90">Ajouter au panier <span aria-hidden="true">↗</span></button><p class="mt-3 text-center text-[9px] text-white/35">Disponibilité et livraison confirmées lors de la commande.</p></div>
+      </div>
+    </section>
+  </div>
+  <div id="orderSummaryLayer" class="quickview-layer fixed inset-0 z-[80] grid place-items-center p-4" aria-hidden="true">
+    <button id="orderSummaryBackdrop" class="absolute inset-0 cursor-default bg-black/75 backdrop-blur-md" aria-label="Fermer le récapitulatif" tabindex="-1"></button>
+    <section id="orderSummaryDialog" class="quickview-panel relative z-10 w-full max-w-lg rounded-2xl border border-white/10 bg-[#141416] p-5 shadow-2xl sm:p-7" role="dialog" aria-modal="true" aria-labelledby="orderSummaryTitle" aria-hidden="true">
+      <div class="flex items-start justify-between gap-4"><div><p class="text-[9px] font-bold uppercase tracking-[.2em] text-white/40">À coller dans votre DM</p><h2 id="orderSummaryTitle" class="display mt-2 text-xl font-semibold">Votre commande</h2></div><button id="orderSummaryClose" class="focus-ring grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/15 text-xl text-white/75 hover:bg-white/10" aria-label="Fermer le récapitulatif">×</button></div>
+      <textarea id="orderSummaryText" class="mt-5 h-52 w-full resize-none rounded-xl border border-white/10 bg-black/30 p-4 text-xs leading-5 text-white/80 outline-none" readonly aria-label="Récapitulatif à copier"></textarea>
+      <button id="copyOrderSummary" class="mt-4 flex h-11 w-full items-center justify-center rounded-full bg-white text-[10px] font-bold uppercase tracking-[.12em] text-black transition hover:brightness-90">Copier le récapitulatif</button>
+      <a class="mt-4 block text-center text-[10px] font-semibold uppercase tracking-[.12em] text-white/55 hover:text-white" href="https://www.instagram.com/lyans_shopp?utm_source=ig_web_button_share_sheet&amp;obrf=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer">Ouvrir le profil @lyans_shopp ↗</a>
+    </section>
+  </div>
+  <div id="toast" class="toast fixed bottom-5 left-1/2 z-[60] -translate-x-1/2 rounded-full border border-white/15 bg-[#f5f5f5] px-5 py-3 text-xs font-semibold text-black shadow-2xl" role="status" aria-live="polite"></div>
+
+  <script>
+    const INSTAGRAM_PROFILE_URL = 'https://www.instagram.com/lyans_shopp?utm_source=ig_web_button_share_sheet&obrf=ZDNlZDc0MzIxNw==';
+    const products = [
+      { id: 1, name: "Jordan 4 Retro 'Black Cat'", category: 'Sneakers', brand: 'Air Jordan', badge: 'BEST-SELLER', variants: [{ color: 'Black Cat', swatch: '#171717', price: 580, image: 'Air jordan/Jordan 4 Retro Black Cat.jpg' }] },
+      { id: 2, name: 'Dior B22 Black Reflective', category: 'Sneakers', brand: 'Dior', badge: 'HYPER RARE', variants: [{ color: 'Black', swatch: '#171717', price: 1290, image: 'Dior/Dior B22 Sneakers.mp4', poster: 'Dior/Dior B30 Sneakers.jpg', media: 'video' }] },
+      { id: 3, name: 'Dior B30 Black', category: 'Sneakers', brand: 'Dior', badge: 'POPULAIRE', variants: [{ color: 'Black', swatch: '#171717', price: 1190, image: 'Dior/Dior B30 Sneakers.jpg' }] },
+      { id: 4, name: 'CDG PLAY Zip Hoodie', category: 'Hauts & Sweats', brand: 'Comme des Garçons', badge: 'NOUVEAU', variants: [{ color: 'Blue (Bleu roi)', swatch: '#2544c7', price: 380, image: 'Comme des Garçons PLAY/Full-Zip Hoodie avec logo cœur noir (Coloris  Blue).jpg' }, { color: 'Grey (Gris chiné)', swatch: '#a1a1aa', price: 380, image: 'Comme des Garçons PLAY/Full-Zip Hoodie avec logo cœur noir (Coloris  Grey  Heather Grey).jpg' }] },
+      { id: 5, name: 'Readymade Tears Flower Hoodie', category: 'Hauts & Sweats', brand: 'Readymade', badge: 'LIMITED', variants: [{ color: 'Grey', swatch: '#a1a1aa', price: 620, image: 'Readymade (Denim Tears)/Flower  Wreath Full-Zip Hoodie (Coloris  Grey).jpg' }, { color: 'Black', swatch: '#171717', price: 620, image: 'Readymade (Denim Tears)/Ready made Tears Flower  Wreath Print Hoodie (Coloris  Black).jpg' }] },
+      { id: 6, name: 'Essentials Core Pullover Hoodie', category: 'Hauts & Sweats', brand: 'Fear of God', badge: 'ESSENTIAL', variants: [{ color: 'Taupe', swatch: '#a28f7a', price: 220, image: 'Fear of God Essentials/Core Fleece Pullover Hoodie (Coloris  Taupe  Dark Oatmeal).jpg' }] },
+      { id: 7, name: 'AMI Paris Hoodie Ami de Cœur', category: 'Hauts & Sweats', brand: 'AMI Paris', badge: 'TENDANCE', variants: [{ color: 'Matcha', swatch: '#71835b', price: 420, image: 'AMI Paris/Ami Paris Hoodie Ami de Cœur Ton sur Ton.jpg' }] },
+      { id: 8, name: 'BAPE 1st Camo Crewneck', category: 'Hauts & Sweats', brand: 'A Bathing Ape', badge: 'STREETWEAR', variants: [{ color: 'Black/Yellow', swatch: 'linear-gradient(135deg,#171717 50%,#d6bd36 50%)', price: 440, image: 'BAPE 1st Camo By Bathing Ape Crewneck Sweatshirt.jpg' }] },
+      { id: 9, name: 'Chrome Hearts Long-Sleeve T-Shirt', category: 'Hauts & Sweats', brand: 'Chrome Hearts', badge: 'EXCLUSIF', variants: [{ color: 'Black', swatch: '#171717', price: 520, image: 'Chrome Hearts/Chrome Hearts Long-Sleeve T-Shirt.jpg' }] },
+      { id: 10, name: "Sp5der 'Pnk!' Rhinestone Sweatpants", category: 'Pantalons & Bas', brand: 'Sp5der', badge: 'HOT', variants: [{ color: 'Pink', swatch: '#ec4899', price: 390, image: 'Sp5der/Sp5der Pink Pnk! Rhinestone Sweatpants.jpg' }] },
+      { id: 11, name: 'Sp5der Real Tree Camo Sweatpants', category: 'Pantalons & Bas', brand: 'Sp5der', badge: 'HOT', variants: [{ color: 'Brown Camo', swatch: 'linear-gradient(135deg,#66543b,#292719 55%,#9a8056)', price: 420, image: 'Sp5der/Sp5der Real Tree Camo Sweatpants.jpg' }] },
+      { id: 12, name: 'Chrome Hearts Cross Patch Denim', category: 'Pantalons & Bas', brand: 'Chrome Hearts', badge: 'RARE', variants: [{ color: 'Blue Denim', swatch: '#42627b', price: 1650, image: 'Chrome Hearts/Chrome Hearts Cross Patch Denim.jpg' }] },
+      { id: 13, name: 'Purple Brand P001 Denim', category: 'Pantalons & Bas', brand: 'Purple Brand', badge: 'TENDANCE', variants: [{ color: 'Light Indigo', swatch: '#839bb5', price: 350, image: 'Purple Brand/Purple Brand P001 Low Rise Skinny Jeans.jpg' }, { color: 'Black', swatch: '#171717', price: 340, image: 'Purple Brand/Purple Brand Black Denim.jpg' }] },
+      { id: 14, name: 'Celine Monogram Track Shorts', category: 'Pantalons & Bas', brand: 'Celine', badge: 'SUMMER', variants: [{ color: 'Black', swatch: '#171717', price: 560, image: 'Celine/Celine Logo-Printed Fleece Sweatshorts (Black).jpg' }] },
+      { id: 15, name: 'Burberry Vintage Check Swim Shorts', category: 'Pantalons & Bas', brand: 'Burberry', badge: 'SUMMER', variants: [{ color: 'Beige', swatch: '#c5ad83', price: 470, image: 'Burberry/Burberry Vintage Check Drawstring Swim Shorts  Casual Shorts.jpg' }] },
+      { id: 16, name: 'Louis Vuitton Trio Messenger', category: 'Sacoches & Accessoires', brand: 'Louis Vuitton', badge: 'LUXE', variants: [{ color: 'White/Monogram', swatch: 'linear-gradient(135deg,#eee8dd,#b9ad9c)', price: 2450, image: 'Louis Vuitton/Sacoche Louis Vuitton Trio Messenger.jpg' }] },
+      { id: 17, name: 'Lacoste Monogram Bag', category: 'Sacoches & Accessoires', brand: 'Lacoste', badge: 'MUST HAVE', variants: [{ color: 'Beige', swatch: '#c5ad83', price: 190, image: 'Lacoste/Sacoche Lacoste Monogram Beige.jpg' }, { color: 'Black', swatch: '#171717', price: 180, image: 'Lacoste/Sacoche Lacoste Noir.jpg' }] },
+      { id: 18, name: 'Burberry B Patch Check Zip Hoodie', category: 'Hauts & Sweats', brand: 'Burberry', badge: 'PRIX INDICATIF', variants: [{ color: 'Vintage Check', swatch: 'linear-gradient(135deg,#bca77c,#504638)', price: 780, image: 'Burberry/Burberry Letter Graphic  B Patch Check Hood Zip Hoodie.jpg' }] },
+      { id: 19, name: 'Syna World Team Tracksuit Hoodie', category: 'Hauts & Sweats', brand: 'Syna World', badge: 'PRIX INDICATIF', variants: [{ color: 'Black / Safety Yellow', swatch: 'linear-gradient(135deg,#171717 50%,#d6bd36 50%)', price: 420, image: 'Syna World/Syna World Logo  Team Tracksuit Hoodie.jpg' }] },
+      { id: 20, name: 'Syna World Team Tracksuit Joggers', category: 'Pantalons & Bas', brand: 'Syna World', badge: 'PRIX INDICATIF', variants: [{ color: 'Black / Safety Yellow', swatch: 'linear-gradient(135deg,#171717 50%,#d6bd36 50%)', price: 380, image: 'Syna World/Syna World Logo  Team Tracksuit Joggers (Black  Safety Yellow).jpg' }] },
+      { id: 21, name: 'Stüssy Basic Crewneck Sweatshirt', category: 'Hauts & Sweats', brand: 'Stüssy', badge: 'PRIX INDICATIF', variants: [{ color: 'Black', swatch: '#171717', price: 220, image: 'Basic Stüssy Crew  Crewneck Sweatshirt.jpg' }] }
+    ];
+
+    const money = new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD', maximumFractionDigits: 0 });
+    const $ = (selector) => document.querySelector(selector);
+    const grid = $('#productGrid');
+    let activeCategory = 'Tous';
+    let activeBrand = 'Tous';
+    let activeBadge = '';
+    let searchQuery = '';
+    const CART_STORAGE_KEY = 'lyans-plug-cart-v3';
+    const selectedVariants = new Map();
+    const selectedSizes = new Map();
+    let cart = readCart();
+    let toastTimer;
+    let activeQuickViewId = null;
+    let audioContext = null;
+
+    function getAudioContext() {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return null;
+      if (!audioContext) audioContext = new AudioContextClass();
+      if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
+      return audioContext;
+    }
+    function playTone(context, frequency, endFrequency, duration, waveform = 'sine', volume = 0.035, delay = 0) {
+      const start = context.currentTime + delay;
+      const oscillator = context.createOscillator();
+      const envelope = context.createGain();
+      oscillator.type = waveform;
+      oscillator.frequency.setValueAtTime(frequency, start);
+      oscillator.frequency.exponentialRampToValueAtTime(endFrequency, start + duration);
+      envelope.gain.setValueAtTime(0.0001, start);
+      envelope.gain.exponentialRampToValueAtTime(volume, start + Math.min(0.012, duration / 3));
+      envelope.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      oscillator.connect(envelope);
+      envelope.connect(context.destination);
+      oscillator.start(start);
+      oscillator.stop(start + duration + 0.01);
+    }
+    function playNoise(context, duration, startFrequency, endFrequency, volume) {
+      const start = context.currentTime;
+      const buffer = context.createBuffer(1, Math.ceil(context.sampleRate * duration), context.sampleRate);
+      const samples = buffer.getChannelData(0);
+      for (let index = 0; index < samples.length; index += 1) samples[index] = Math.random() * 2 - 1;
+      const source = context.createBufferSource();
+      const filter = context.createBiquadFilter();
+      const envelope = context.createGain();
+      source.buffer = buffer;
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(startFrequency, start);
+      filter.frequency.exponentialRampToValueAtTime(endFrequency, start + duration);
+      envelope.gain.setValueAtTime(0.0001, start);
+      envelope.gain.exponentialRampToValueAtTime(volume, start + 0.015);
+      envelope.gain.exponentialRampToValueAtTime(0.0001, start + duration);
+      source.connect(filter);
+      filter.connect(envelope);
+      envelope.connect(context.destination);
+      source.start(start);
+      source.stop(start + duration + 0.01);
+    }
+    function playSound(effect) {
+      try {
+        const context = getAudioContext();
+        if (!context) return;
+        if (effect === 'quickView') {
+          playNoise(context, 0.22, 420, 2600, 0.032);
+          playTone(context, 210, 82, 0.16, 'sine', 0.025);
+        } else if (effect === 'variant') {
+          playTone(context, 1500, 760, 0.035, 'square', 0.022);
+          playTone(context, 2550, 2100, 0.018, 'sine', 0.012);
+        } else if (effect === 'size') {
+          playTone(context, 1180, 720, 0.065, 'sine', 0.045);
+          playTone(context, 1680, 1300, 0.05, 'sine', 0.022, 0.035);
+        } else if (effect === 'add') {
+          playTone(context, 520, 680, 0.13, 'sine', 0.05);
+          playTone(context, 820, 1320, 0.2, 'sine', 0.042, 0.055);
+        } else if (effect === 'cart') {
+          playNoise(context, 0.19, 560, 2200, 0.027);
+          playTone(context, 300, 560, 0.15, 'triangle', 0.03);
+        } else if (effect === 'remove') {
+          playNoise(context, 0.15, 720, 150, 0.03);
+          playTone(context, 240, 78, 0.18, 'triangle', 0.028);
+        } else if (effect === 'checkout') {
+          playNoise(context, 0.24, 680, 3100, 0.028);
+          playTone(context, 520, 660, 0.14, 'sine', 0.045);
+          playTone(context, 740, 990, 0.17, 'sine', 0.04, 0.045);
+          playTone(context, 990, 1320, 0.22, 'sine', 0.035, 0.09);
+        } else if (effect === 'copy') {
+          playTone(context, 960, 1180, 0.07, 'sine', 0.032);
+        } else if (effect === 'close') {
+          playNoise(context, 0.12, 2200, 420, 0.022);
+        } else if (effect === 'filter') {
+          playTone(context, 960, 1260, 0.04, 'square', 0.018);
+        }
+      } catch (error) {
+        console.warn('Lyans Plug audio FX unavailable.', error);
+      }
+    }
+    function readCart() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+        return Array.isArray(parsed) ? parsed.filter(item => {
+          const product = products.find(entry => entry.id === item.id);
+          return product && Number.isInteger(item.variantIndex) && product.variants[item.variantIndex] && sizeOptions(product).includes(item.size) && Number.isInteger(item.quantity) && item.quantity > 0;
+        }) : [];
+      } catch { return []; }
+    }
+    function persistCart() { localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart)); }
+    function safeText(value) { return String(value).replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char])); }
+
+    function getSelectedVariant(product) {
+      const index = selectedVariants.get(product.id) ?? 0;
+      return product.variants[index] || product.variants[0];
+    }
+    function sizeOptions(product) {
+      if (product.category === 'Sneakers') return ['US 7', 'US 8', 'US 8.5', 'US 9', 'US 9.5', 'US 10', 'US 10.5', 'US 11', 'US 12'];
+      if (product.category === 'Sacoches & Accessoires') return ['Taille unique'];
+      return ['S', 'M', 'L', 'XL'];
+    }
+    function getSelectedSize(product) {
+      return selectedSizes.get(product.id) ?? (sizeOptions(product).length === 1 ? sizeOptions(product)[0] : '');
+    }
+    function populateBrandFilter() {
+      const select = $('#brandFilter');
+      const brands = [...new Set(products.map(product => product.brand))].sort((a, b) => a.localeCompare(b, 'fr'));
+      select.innerHTML = '<option value="Tous">Toutes les marques</option>' + brands.map(brand => `<option value="${safeText(brand)}">${safeText(brand)}</option>`).join('');
+    }
+    function productMedia(product, variant) {
+      const label = safeText(product.name);
+      if (variant.media === 'video') return `<video class="product-image h-full w-full object-cover" src="${encodeURI(variant.image)}" poster="${encodeURI(variant.poster)}" muted autoplay loop playsinline aria-label="${label} — ${safeText(variant.color)}"></video>`;
+      return `<img class="product-image h-full w-full object-cover" src="${encodeURI(variant.image)}" alt="${label} — ${safeText(variant.color)}" loading="lazy" onerror="this.onerror=null;this.parentElement.innerHTML='<div class=&quot;grid h-full place-items-center bg-[#1b1b1e] px-4 text-center&quot;><span class=&quot;display text-sm font-semibold text-white/45&quot;>${safeText(product.brand)}</span></div>'" />`;
+    }
+    function renderQuickView() {
+      const product = products.find(entry => entry.id === activeQuickViewId);
+      if (!product) return;
+      const variant = getSelectedVariant(product);
+      const selectedVariantIndex = product.variants.indexOf(variant);
+      const size = getSelectedSize(product);
+      const sizes = sizeOptions(product);
+      $('#quickViewBrand').textContent = product.brand;
+      $('#quickViewTitle').textContent = product.name;
+      $('#quickViewPrice').textContent = money.format(variant.price);
+      $('#quickViewBadge').textContent = product.badge;
+      $('#quickViewMedia').innerHTML = productMedia(product, variant);
+      $('#quickViewSelectedColor').textContent = `· ${variant.color}`;
+      $('#quickViewSizeLabel').textContent = product.category === 'Sneakers' ? 'Choisir une pointure (US)' : 'Choisir une taille';
+      $('#quickViewColors').innerHTML = product.variants.map((option, index) => `<button type="button" class="color-swatch focus-ring h-7 w-7 rounded-full border border-white/30 transition hover:scale-110 ${index === selectedVariantIndex ? 'selected' : ''}" style="--swatch:${safeText(option.swatch)}" data-quick-color="${index}" aria-label="${safeText(option.color)}" aria-pressed="${index === selectedVariantIndex}" title="${safeText(option.color)}"></button>`).join('');
+      $('#quickViewSizes').innerHTML = sizes.map(option => `<button type="button" class="quick-size focus-ring min-w-11 rounded-full border border-white/15 px-4 py-2.5 text-[10px] font-semibold transition hover:border-white/50 ${size === option ? 'selected' : 'text-white/70'}" data-quick-size="${safeText(option)}" aria-pressed="${size === option}">${safeText(option)}</button>`).join('');
+      $('#quickViewColors').querySelectorAll('[data-quick-color]').forEach(button => button.addEventListener('click', () => {
+        selectedVariants.set(product.id, Number(button.dataset.quickColor));
+        playSound('variant');
+        renderQuickView();
+      }));
+      $('#quickViewSizes').querySelectorAll('[data-quick-size]').forEach(button => button.addEventListener('click', () => {
+        selectedSizes.set(product.id, button.dataset.quickSize);
+        playSound('size');
+        renderQuickView();
+      }));
+    }
+    function openQuickView(id) {
+      activeQuickViewId = id;
+      playSound('quickView');
+      renderQuickView();
+      $('#quickViewLayer').classList.add('open');
+      $('#quickViewLayer').setAttribute('aria-hidden', 'false');
+      $('#quickViewDialog').setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      $('#quickViewClose').focus();
+    }
+    function closeQuickView() {
+      const previousId = activeQuickViewId;
+      $('#quickViewLayer').classList.remove('open');
+      $('#quickViewLayer').setAttribute('aria-hidden', 'true');
+      $('#quickViewDialog').setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      activeQuickViewId = null;
+      playSound('close');
+      renderProducts();
+      if (previousId) $(`#productGrid article[data-product-id="${previousId}"]`)?.focus();
+    }
+    function closeModal() { closeQuickView(); }
+    function filteredProducts() {
+      return products.filter(product => {
+        const matchesCategory = activeCategory === 'Tous' || product.category === activeCategory;
+        const matchesBrand = activeBrand === 'Tous' || product.brand === activeBrand;
+        const matchesSearch = `${product.name} ${product.brand}`.toLocaleLowerCase('fr').includes(searchQuery.toLocaleLowerCase('fr'));
+        const matchesBadge = !activeBadge || product.badge === activeBadge;
+        return matchesCategory && matchesBrand && matchesSearch && matchesBadge;
+      });
+    }
+    function renderProducts() {
+      const visible = filteredProducts();
+      $('#resultCount').textContent = `${visible.length} ${visible.length > 1 ? 'pièces' : 'pièce'}`;
+      $('#activeSearch').classList.toggle('hidden', !searchQuery);
+      $('#activeSearch').classList.toggle('flex', !!searchQuery);
+      $('#searchTerm').textContent = `« ${searchQuery} »`;
+      $('#emptyState').classList.toggle('hidden', visible.length > 0);
+      grid.classList.toggle('hidden', visible.length === 0);
+      grid.innerHTML = visible.map((product, index) => `
+        ${(() => {
+          const variant = getSelectedVariant(product);
+          const variantIndex = product.variants.indexOf(variant);
+          const size = getSelectedSize(product);
+          const sizes = sizeOptions(product);
+          const variantControls = product.variants.length > 1
+            ? `<div class="mt-3 flex items-center justify-between gap-2"><div class="flex items-center gap-2" role="group" aria-label="Choisir une couleur">${product.variants.map((option, optionIndex) => `<button type="button" class="color-swatch focus-ring h-5 w-5 rounded-full border border-white/30 transition hover:scale-110 ${optionIndex === variantIndex ? 'selected' : ''}" style="--swatch:${safeText(option.swatch)}" data-variant-select="${product.id}" data-variant-index="${optionIndex}" aria-label="Choisir ${safeText(option.color)}" aria-pressed="${optionIndex === variantIndex}" title="${safeText(option.color)}"></button>`).join('')}</div><span class="truncate text-[9px] text-white/45">${safeText(variant.color)}</span></div>`
+            : `<p class="mt-3 text-[9px] text-white/40">Couleur · ${safeText(variant.color)}</p>`;
+          const sizeControl = `<label class="mt-3 flex items-center justify-between gap-2 text-[9px] uppercase tracking-[.12em] text-white/40"><span>${product.category === 'Sneakers' ? 'Pointure' : 'Taille'}</span><select id="size-select-${product.id}" data-size-select="${product.id}" class="focus-ring h-8 min-w-24 rounded-full border border-white/15 bg-[#141416] px-3 text-[10px] normal-case tracking-normal text-white/80 outline-none"><option value="" ${size ? '' : 'selected'}>Choisir</option>${sizes.map(option => `<option value="${safeText(option)}" ${size === option ? 'selected' : ''}>${safeText(option)}</option>`).join('')}</select></label>`;
+          return `<article class="product-card group min-w-0 cursor-pointer rounded-xl transition-all duration-300" data-product-id="${product.id}" tabindex="0" aria-label="Ouvrir la fiche ${safeText(product.name)}" style="animation-delay:${Math.min(index * 35, 280)}ms">
+          <div class="relative aspect-[4/4.7] overflow-hidden rounded-xl bg-[#171719]">
+            ${productMedia(product, variant)}
+            <span class="absolute left-2.5 top-2.5 max-w-[75%] truncate rounded-full border border-white/15 bg-black/65 px-2.5 py-1.5 text-[8px] font-bold uppercase tracking-[.12em] backdrop-blur-sm sm:left-3 sm:top-3 sm:text-[9px]">${safeText(product.badge)}</span>
+            <span class="absolute right-2.5 top-2.5 flex items-center gap-1.5 rounded-full bg-black/60 px-2 py-1.5 text-[8px] font-semibold uppercase tracking-wider text-white/75 backdrop-blur-sm"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>En stock</span>
+            <button class="add-to-cart focus-ring absolute bottom-3 left-3 right-3 flex h-10 translate-y-2 items-center justify-center gap-2 rounded-full bg-white text-[9px] font-bold uppercase tracking-[.14em] text-black opacity-0 transition-all duration-200 hover:brightness-90 group-hover:translate-y-0 group-hover:opacity-100 max-sm:translate-y-0 max-sm:opacity-100" data-add="${product.id}" aria-label="Ajouter ${safeText(product.name)} ${safeText(variant.color)} au panier">Ajouter au panier <span class="text-base leading-none">+</span></button>
+          </div>
+          <div class="px-0.5 pt-3 sm:pt-4"><p class="mb-1.5 truncate text-[9px] font-semibold uppercase tracking-[.16em] text-white/40">${safeText(product.brand)}</p><div class="flex items-start justify-between gap-2"><h3 class="line-clamp-2 min-h-[2.5em] text-xs font-medium leading-5 text-white/90 sm:text-sm">${safeText(product.name)}</h3><span class="shrink-0 text-xs font-bold sm:text-sm">${money.format(variant.price)}</span></div><p class="mt-2 text-[9px] uppercase tracking-[.1em] text-white/30">${safeText(product.category)}</p>${variantControls}${sizeControl}</div>
+        </article>`;
+        })()}`).join('');
+      grid.querySelectorAll('[data-add]').forEach(button => button.addEventListener('click', () => addToCart(Number(button.dataset.add))));
+      grid.querySelectorAll('[data-variant-select]').forEach(button => button.addEventListener('click', () => {
+        selectedVariants.set(Number(button.dataset.variantSelect), Number(button.dataset.variantIndex));
+        playSound('variant');
+        renderProducts();
+      }));
+      grid.querySelectorAll('[data-size-select]').forEach(select => select.addEventListener('change', () => {
+        selectedSizes.set(Number(select.dataset.sizeSelect), select.value);
+        if (select.value) playSound('size');
+      }));
+      grid.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', event => {
+          if (event.target.closest('button, select, a, input')) return;
+          openQuickView(Number(card.dataset.productId));
+        });
+        card.addEventListener('keydown', event => {
+          if (event.target === card && (event.key === 'Enter' || event.key === ' ')) {
+            event.preventDefault();
+            openQuickView(Number(card.dataset.productId));
+          }
+        });
+      });
+    }
+    function cartQuantity() { return cart.reduce((sum, item) => sum + item.quantity, 0); }
+    function addToCart(id) {
+      const product = products.find(entry => entry.id === id);
+      const variantIndex = selectedVariants.get(id) ?? 0;
+      const variant = product.variants[variantIndex];
+      const size = getSelectedSize(product);
+      if (!size) {
+        showToast(`Choisissez une taille pour ${product.name}`);
+        const sizePicker = $('#quickViewLayer').classList.contains('open') ? $('#quickViewSizes button') : $(`#size-select-${id}`);
+        sizePicker?.focus();
+        return false;
+      }
+      const item = cart.find(entry => entry.id === id && entry.variantIndex === variantIndex && entry.size === size);
+      if (item) item.quantity += 1; else cart.push({ id, variantIndex, size, quantity: 1 });
+      playSound('add');
+      persistCart(); renderCart(); showToast(`${product.name} — ${variant.color}, taille ${size} ajouté au panier`);
+      return true;
+    }
+    function updateQuantity(id, variantIndex, size, change) {
+      const item = cart.find(entry => entry.id === id && entry.variantIndex === variantIndex && entry.size === size);
+      if (!item) return;
+      item.quantity += change;
+      if (item.quantity < 1) {
+        playSound('remove');
+        cart = cart.filter(entry => !(entry.id === id && entry.variantIndex === variantIndex && entry.size === size));
+      } else playSound(change > 0 ? 'add' : 'variant');
+      persistCart(); renderCart();
+    }
+    function removeItem(id, variantIndex, size) { playSound('remove'); cart = cart.filter(item => !(item.id === id && item.variantIndex === variantIndex && item.size === size)); persistCart(); renderCart(); }
+    function renderCart() {
+      const count = cartQuantity();
+      $('#cartCount').textContent = count > 99 ? '99+' : count;
+      $('#drawerCount').textContent = `(${count})`;
+      const itemsContainer = $('#cartItems');
+      if (!cart.length) {
+        itemsContainer.innerHTML = `<div class="flex h-full min-h-[300px] flex-col items-center justify-center text-center"><span class="mb-5 grid h-16 w-16 place-items-center rounded-full border border-white/10 text-2xl text-white/40">↗</span><p class="display text-lg font-semibold">Votre panier est vide.</p><p class="mt-2 text-xs text-white/40">Il est temps de trouver votre prochaine pièce.</p><button id="continueShopping" class="mt-6 rounded-full bg-white px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-black">Continuer le shopping</button></div>`;
+        $('#continueShopping').addEventListener('click', closeCart);
+      } else {
+        itemsContainer.innerHTML = cart.map(item => {
+          const product = products.find(entry => entry.id === item.id);
+          const variant = product.variants[item.variantIndex];
+          const media = variant.media === 'video' ? `<video class="h-full w-full object-cover" src="${encodeURI(variant.image)}" poster="${encodeURI(variant.poster)}" muted playsinline></video>` : `<img class="h-full w-full object-cover" src="${encodeURI(variant.image)}" alt="${safeText(product.name)} — ${safeText(variant.color)}" />`;
+          const sizeLabel = product.category === 'Sneakers' ? 'Pointure' : 'Taille';
+          return `<article class="flex gap-4 border-b border-white/[.08] py-5"><div class="h-24 w-[76px] shrink-0 overflow-hidden rounded-lg bg-[#1b1b1e]">${media}</div><div class="flex min-w-0 flex-1 flex-col"><p class="text-[9px] font-semibold uppercase tracking-[.13em] text-white/40">${safeText(product.brand)}</p><h3 class="mt-1 line-clamp-2 text-xs font-medium leading-5">${safeText(product.name)}</h3><p class="mt-1 text-[10px] text-white/45">${safeText(variant.color)} · ${sizeLabel} ${safeText(item.size)}</p><div class="mt-auto flex items-end justify-between gap-2 pt-3"><div class="flex h-8 items-center rounded-full border border-white/15"><button class="h-8 w-8 text-white/70 hover:text-white" data-quantity="${product.id}" data-variant-index="${item.variantIndex}" data-size="${safeText(item.size)}" data-change="-1" aria-label="Diminuer la quantité">−</button><span class="w-5 text-center text-[10px]">${item.quantity}</span><button class="h-8 w-8 text-white/70 hover:text-white" data-quantity="${product.id}" data-variant-index="${item.variantIndex}" data-size="${safeText(item.size)}" data-change="1" aria-label="Augmenter la quantité">+</button></div><strong class="text-xs">${money.format(variant.price * item.quantity)}</strong></div></div><button class="self-start p-1 text-white/35 transition hover:text-white" data-remove="${product.id}" data-variant-index="${item.variantIndex}" data-size="${safeText(item.size)}" aria-label="Supprimer ${safeText(product.name)} — ${safeText(variant.color)}, ${sizeLabel.toLowerCase()} ${safeText(item.size)}">×</button></article>`;
+        }).join('');
+        itemsContainer.querySelectorAll('[data-quantity]').forEach(button => button.addEventListener('click', () => updateQuantity(Number(button.dataset.quantity), Number(button.dataset.variantIndex), button.dataset.size, Number(button.dataset.change))));
+        itemsContainer.querySelectorAll('[data-remove]').forEach(button => button.addEventListener('click', () => removeItem(Number(button.dataset.remove), Number(button.dataset.variantIndex), button.dataset.size)));
+      }
+      const total = cart.reduce((sum, item) => sum + products.find(product => product.id === item.id).variants[item.variantIndex].price * item.quantity, 0);
+      $('#cartTotal').textContent = money.format(total);
+      $('#instagramCheckout').disabled = !cart.length;
+    }
+    function buildOrderSummary() {
+      const total = cart.reduce((sum, item) => sum + products.find(product => product.id === item.id).variants[item.variantIndex].price * item.quantity, 0);
+      const lines = cart.map(item => {
+        const product = products.find(entry => entry.id === item.id);
+        const variant = product.variants[item.variantIndex];
+        const sizeLabel = product.category === 'Sneakers' ? 'Pointure' : 'Taille';
+        return `• ${product.name}\n  Couleur : ${variant.color} | ${sizeLabel} : ${item.size} | Quantité : ${item.quantity}\n  Total article : ${money.format(variant.price * item.quantity)}`;
+      });
+      return `Bonjour Lyans Plug,\n\nJe souhaite commander :\n\n${lines.join('\n\n')}\n\nTotal de la commande (CAD) : ${money.format(total)}\n\nMerci de confirmer la disponibilité et la livraison.`;
+    }
+    async function copyOrderText(text) {
+      try {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+      } catch { /* Use the selection/copy fallback below. */ }
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      let copied = false;
+      try { copied = document.execCommand('copy'); } catch { copied = false; }
+      textarea.remove();
+      return copied;
+    }
+    function openOrderSummary(text) {
+      $('#orderSummaryText').value = text;
+      $('#copyOrderSummary').textContent = 'Copier le récapitulatif';
+      $('#orderSummaryLayer').classList.add('open');
+      $('#orderSummaryLayer').setAttribute('aria-hidden', 'false');
+      $('#orderSummaryDialog').setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      $('#orderSummaryClose').focus();
+    }
+    function closeOrderSummary() {
+      $('#orderSummaryLayer').classList.remove('open');
+      $('#orderSummaryLayer').setAttribute('aria-hidden', 'true');
+      $('#orderSummaryDialog').setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = $('#cartDrawer').classList.contains('open') ? 'hidden' : '';
+      playSound('close');
+      $('#instagramCheckout').focus();
+    }
+    async function handleInstagramCheckout() {
+      if (!cart.length) return;
+      const summary = buildOrderSummary();
+      const instagramTab = window.open(INSTAGRAM_PROFILE_URL, '_blank');
+      if (instagramTab) instagramTab.opener = null;
+      playSound('checkout');
+      const copied = await copyOrderText(summary);
+      if (copied) {
+        showToast('Commande copiée — collez-la dans le DM Instagram.');
+        if (!instagramTab) openOrderSummary(summary);
+      } else {
+        openOrderSummary(summary);
+        $('#orderSummaryText').focus();
+        $('#orderSummaryText').select();
+      }
+    }
+    function openCart() { playSound('cart'); $('#cartDrawer').classList.add('open'); $('#cartOverlay').classList.add('open'); $('#cartDrawer').setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; $('#cartClose').focus(); }
+    function closeCart() { $('#cartDrawer').classList.remove('open'); $('#cartOverlay').classList.remove('open'); $('#cartDrawer').setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; playSound('close'); $('#cartOpen').focus(); }
+    function showToast(message) { const toast = $('#toast'); toast.textContent = message; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 2300); }
+    function resetFilters() { playSound('filter'); activeCategory = 'Tous'; activeBrand = 'Tous'; activeBadge = ''; searchQuery = ''; $('#brandFilter').value = 'Tous'; $('#searchInput').value = ''; $('#mobileSearchInput').value = ''; updateCategoryButtons(); renderProducts(); }
+    function updateCategoryButtons() { document.querySelectorAll('.category-button').forEach(button => { const active = button.dataset.category === activeCategory; button.classList.toggle('active', active); button.classList.toggle('text-white/65', !active); }); }
+    function setSearch(value) { searchQuery = value.trim(); $('#searchInput').value = value; $('#mobileSearchInput').value = value; renderProducts(); }
+
+    document.querySelectorAll('.category-button').forEach(button => button.addEventListener('click', () => { activeCategory = button.dataset.category; activeBadge = ''; playSound('filter'); updateCategoryButtons(); renderProducts(); }));
+    $('#brandFilter').addEventListener('change', event => { activeBrand = event.target.value; playSound('filter'); renderProducts(); });
+    $('#searchInput').addEventListener('input', event => setSearch(event.target.value));
+    $('#mobileSearchInput').addEventListener('input', event => setSearch(event.target.value));
+    $('#mobileSearchToggle').addEventListener('click', () => { $('#mobileSearch').classList.toggle('hidden'); if (!$('#mobileSearch').classList.contains('hidden')) $('#mobileSearchInput').focus(); });
+    $('#clearSearch').addEventListener('click', () => setSearch(''));
+    $('#resetFilters').addEventListener('click', resetFilters);
+    document.querySelectorAll('[data-quick-filter]').forEach(link => link.addEventListener('click', () => { activeCategory = 'Tous'; activeBadge = link.dataset.quickFilter; playSound('filter'); updateCategoryButtons(); renderProducts(); }));
+    $('#cartOpen').addEventListener('click', openCart);
+    $('#cartOverlay').addEventListener('click', closeCart);
+    $('#quickViewBackdrop').addEventListener('click', closeModal);
+    $('#quickViewAdd').addEventListener('click', () => {
+      if (addToCart(activeQuickViewId)) closeQuickView();
+    });
+    $('#instagramCheckout').addEventListener('click', handleInstagramCheckout);
+    $('#orderSummaryClose').addEventListener('click', closeOrderSummary);
+    $('#orderSummaryBackdrop').addEventListener('click', closeOrderSummary);
+    $('#copyOrderSummary').addEventListener('click', async () => {
+      const copied = await copyOrderText($('#orderSummaryText').value);
+      if (copied) {
+        playSound('copy');
+        closeOrderSummary();
+        showToast('Récapitulatif copié dans le presse-papiers.');
+      } else {
+        $('#orderSummaryText').focus();
+        $('#orderSummaryText').select();
+        $('#copyOrderSummary').textContent = 'Sélectionnez puis copiez le texte';
+      }
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      if ($('#orderSummaryLayer').classList.contains('open')) closeOrderSummary();
+      else if ($('#quickViewLayer').classList.contains('open')) closeQuickView();
+      else if ($('#cartDrawer').classList.contains('open')) closeCart();
+    });
+    $('#year').textContent = new Date().getFullYear();
+    populateBrandFilter();
+    renderProducts();
+    renderCart();
+  </script>
+</body>
+</html>
