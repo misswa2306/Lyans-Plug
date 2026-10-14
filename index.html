@@ -49,6 +49,44 @@
     .product-card:hover .product-image { transform: scale(1.055); }
     .product-card:hover { box-shadow: 0 22px 60px rgba(0,0,0,.42); }
     .product-image { transition: transform .45s cubic-bezier(.2,.7,.2,1); }
+    #preorderGrid a[aria-label$="sur Instagram"],
+    #preorderGrid a[aria-label$="sur WhatsApp"] {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      padding: .625rem 1rem;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .05em;
+    }
+    #preorderGrid a[aria-label$="sur Instagram"] {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .375rem;
+      min-width: 0;
+      padding-right: .375rem;
+      padding-left: .375rem;
+      font-size: .625rem;
+      letter-spacing: .04em;
+      white-space: nowrap;
+      text-align: center;
+      background: #fff;
+      color: #111;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,.2), 0 2px 4px -2px rgba(0,0,0,.2);
+      transition: background-color .3s ease, box-shadow .3s ease;
+    }
+    #preorderGrid a[aria-label$="sur Instagram"]:hover {
+      background: #f5f5f5;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,.25), 0 4px 6px -4px rgba(0,0,0,.25);
+    }
+    #preorderGrid a[aria-label$="sur Instagram"] svg,
+    #preorderGrid a[aria-label$="sur WhatsApp"] svg { width: 1.25rem; height: 1.25rem; }
+    #preorderGrid a[aria-label$="sur Instagram"] svg { width: 1.25rem; height: 1.25rem; flex: 0 0 1.25rem; }
+    @media (max-width: 639px) {
+      #preorderGrid article > div:last-child > div { grid-template-columns: 1fr; }
+    }
     .hide-scrollbar::-webkit-scrollbar { display:none; }
     .hide-scrollbar { scrollbar-width:none; }
     #cartDrawer.drawer { top:50%; right:auto; left:50%; width:min(92vw,620px); max-width:620px; height:min(84vh,780px); border:1px solid var(--line); border-radius:18px; transform:translate(-50%,-48%) scale(.98); opacity:0; visibility:hidden; pointer-events:none; transition:transform .32s cubic-bezier(.2,.8,.2,1), opacity .25s ease, visibility .25s ease; }
@@ -143,6 +181,7 @@
         <a class="transition hover:text-white" href="#catalogue">Catalogue</a>
         <a class="transition hover:text-white" href="#catalogue" data-quick-filter="NOUVEAU">Nouveautés</a>
         <a class="transition hover:text-white" href="#catalogue" data-quick-filter="BEST-SELLER">Top sellers</a>
+        <a class="transition hover:text-white" href="#precommandes">Précommandes 🔌</a>
         <a class="transition hover:text-white" href="#a-venir">À venir</a>
         <a class="transition hover:text-white" href="#contact">Contact</a>
       </nav>
@@ -198,6 +237,18 @@
       <div id="emptyState" class="hidden rounded-2xl border border-dashed border-white/15 px-5 py-20 text-center"><p class="display text-xl font-semibold">Aucune pièce trouvée.</p><p class="mt-2 text-sm text-white/45">Essayez un autre terme ou une autre catégorie.</p><button id="resetFilters" class="mt-5 text-xs font-semibold uppercase tracking-widest underline underline-offset-4">Réinitialiser les filtres</button></div>
     </section>
 
+    <section id="precommandes" class="scroll-mt-24 border-t border-white/10 py-12 sm:py-16 md:py-20">
+      <div class="mb-8 flex flex-col justify-between gap-4 sm:mb-10 sm:flex-row sm:items-end">
+        <div>
+          <p class="mb-2 text-[10px] font-bold uppercase tracking-[.25em] text-white/45">Sélection exclusive · Commandes ouvertes</p>
+          <h2 class="display text-3xl font-semibold tracking-[-.06em] sm:text-4xl">Précommandes <span aria-hidden="true">🔌</span></h2>
+          <p class="mt-3 max-w-xl text-xs leading-5 text-white/50 sm:text-sm">Choisissez votre pièce et envoyez-nous votre demande sur Instagram ou WhatsApp. Prix, tailles et disponibilités confirmés par message.</p>
+        </div>
+        <span id="preorderCount" class="shrink-0 text-xs text-white/40">49 pièces</span>
+      </div>
+      <div id="preorderGrid" class="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 lg:gap-8"></div>
+    </section>
+
     <section id="a-venir" class="scroll-mt-24 border-t border-white/10 py-12 sm:py-16 md:py-20">
       <div class="mb-10 flex items-end justify-between gap-4">
         <div><p class="mb-2 text-[10px] font-bold uppercase tracking-[.25em] text-white/45">Prochaines sorties &amp; restocks</p><h2 class="display text-3xl font-semibold tracking-[-.06em] sm:text-4xl">À venir<span class="text-white/35">.</span></h2></div>
@@ -241,6 +292,28 @@
       </div>
     </section>
   </div>
+  <div id="preorderQuickViewLayer" class="quickview-layer fixed inset-0 z-[75] grid place-items-center p-3 sm:p-6" aria-hidden="true">
+    <button id="preorderQuickViewBackdrop" class="absolute inset-0 cursor-default bg-black/80 backdrop-blur-sm" aria-label="Fermer la fiche de précommande" tabindex="-1"></button>
+    <section id="preorderQuickViewDialog" class="quickview-panel relative z-10 grid max-h-[92dvh] w-full max-w-4xl grid-cols-1 overflow-y-auto rounded-2xl border border-white/10 bg-neutral-900 shadow-2xl md:grid-cols-2" role="dialog" aria-modal="true" aria-labelledby="preorderQuickViewTitle" aria-hidden="true">
+      <div class="relative flex min-h-[240px] items-center justify-center bg-white sm:min-h-[340px] md:min-h-[500px]">
+        <img id="preorderQuickViewImage" class="h-full max-h-[42dvh] w-full object-contain p-5 md:max-h-full md:p-8" alt="" />
+        <span class="absolute left-4 top-4 rounded-full border border-white/15 bg-black/75 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[.14em] text-white">Précommande</span>
+      </div>
+      <div class="flex flex-col p-5 sm:p-8">
+        <div class="flex items-start justify-between gap-4">
+          <div><p id="preorderQuickViewBrand" class="text-[10px] font-semibold uppercase tracking-[.2em] text-white/45"></p><h2 id="preorderQuickViewTitle" class="display mt-2 text-2xl font-semibold leading-tight tracking-[-.045em] text-white sm:text-3xl"></h2></div>
+          <button id="preorderQuickViewClose" type="button" class="focus-ring grid h-11 w-11 shrink-0 place-items-center rounded-full border border-white/15 bg-neutral-800/80 text-xl text-white/80 transition hover:bg-white/10" aria-label="Fermer la fiche de précommande">×</button>
+        </div>
+        <p id="preorderQuickViewColor" class="mt-4 text-sm text-white/60"></p>
+        <p id="preorderQuickViewPrice" class="display mt-5 text-xl font-bold text-white"></p>
+        <p class="mt-2 text-xs leading-5 text-white/45">Prix fixe selon la catégorie du produit. Disponibilité et livraison à confirmer lors de la commande.</p>
+        <div class="mt-8 grid gap-3">
+          <a id="preorderQuickViewInstagram" class="focus-ring flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-5 text-[10px] font-bold uppercase tracking-[.12em] text-black transition hover:bg-neutral-200" href="#" target="_blank" rel="noopener noreferrer"></a>
+          <a id="preorderQuickViewWhatsApp" class="focus-ring flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 text-[10px] font-bold uppercase tracking-[.12em] text-white transition hover:bg-[#128C7E]" href="#" target="_blank" rel="noopener noreferrer"></a>
+        </div>
+      </div>
+    </section>
+  </div>
   <div id="orderSummaryLayer" class="quickview-layer fixed inset-0 z-[80] grid place-items-center p-4" aria-hidden="true">
     <button id="orderSummaryBackdrop" class="absolute inset-0 cursor-default bg-black/75 backdrop-blur-md" aria-label="Fermer le récapitulatif" tabindex="-1"></button>
     <section id="orderSummaryDialog" class="quickview-panel relative z-10 w-full max-w-lg rounded-2xl border border-white/10 bg-[#141416] p-5 shadow-2xl sm:p-7" role="dialog" aria-modal="true" aria-labelledby="orderSummaryTitle" aria-hidden="true">
@@ -251,9 +324,12 @@
     </section>
   </div>
   <nav class="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#0b0b0c]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden" aria-label="Navigation mobile">
-    <div class="mx-auto grid h-16 max-w-[1440px] grid-cols-4 items-center px-2">
+    <div class="mx-auto grid h-16 max-w-[1440px] grid-cols-5 items-center px-1">
       <a href="#catalogue" class="focus-ring flex h-full flex-col items-center justify-center gap-1 text-[9px] font-medium text-white/65 transition hover:text-white" aria-label="Catalogue">
         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/></svg><span>Catalogue</span>
+      </a>
+      <a href="#precommandes" class="focus-ring flex h-full flex-col items-center justify-center gap-1 text-[9px] font-medium text-white/65 transition hover:text-white" aria-label="Précommandes">
+        <span class="text-lg leading-5" aria-hidden="true">🔌</span><span>Précommandes</span>
       </a>
       <a href="#a-venir" class="focus-ring flex h-full flex-col items-center justify-center gap-1 text-[9px] font-medium text-white/65 transition hover:text-white" aria-label="À venir">
         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.64 5.64l2.12 2.12m8.48 8.48 2.12 2.12m0-12.72-2.12 2.12m-8.48 8.48-2.12 2.12"/><circle cx="12" cy="12" r="4"/></svg><span>À venir</span>
@@ -270,6 +346,59 @@
 
   <script>
     const INSTAGRAM_PROFILE_URL = 'https://instagram.com/lyans_shopp';
+    const INSTAGRAM_DM_URL = 'https://ig.me/m/lyans_shopp';
+    const INSTAGRAM_ICON_MARKUP = '<svg class="inline-block h-6 w-6 shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#fff" stroke="#000" stroke-width="1.25"/><rect x="7" y="7" width="10" height="10" rx="3" fill="none" stroke="#000" stroke-width="1.25"/><circle cx="12" cy="12" r="2.4" fill="none" stroke="#000" stroke-width="1.25"/><circle cx="15.2" cy="8.8" r=".75" fill="#000"/></svg>';
+    const preorderProducts = [
+      { brand: 'Alexander McQueen', name: 'Graffiti Logo Knit Jumper', color: 'Black White', price: 450, image: "ALEXANDER-MCQUEEN/Alexander McQueen Graffiti Logo Knit Jumper 'Black White'.jpg" },
+      { brand: 'Alexander McQueen', name: 'Oversized Sneaker', color: 'White Black Suede', price: 500, image: "ALEXANDER-MCQUEEN/Alexander McQueen Oversized Sneaker 'White Black Suede'.png" },
+      { brand: 'Alo Yoga', name: 'Accolade Half-Zip Pullover', color: 'Black', price: 450, image: "ALO-YOGA/Alo Yoga Accolade Half-Zip Pullover 'Black'.jpg" },
+      { brand: 'Alo Yoga', name: 'Accolade Sweatpants', color: 'Black', price: 350, image: "ALO-YOGA/Alo Yoga Accolade Sweatpants 'Black'.jpg" },
+      { brand: 'Alo Yoga', name: 'Accolade Hoodie', color: 'Black', price: 450, image: "ALO-YOGA/Alo Yoga Accolade Hoodie 'Black'.jpg" },
+      { brand: 'Amiri', name: 'Core Logo Printed Hoodie', color: 'Black', price: 450, image: "AMIRI/Amiri Core Logo Printed Hoodie 'Black'.jpg" },
+      { brand: 'Amiri', name: 'MA Monogram Skinny Jeans', color: 'Light Blue', price: 350, image: "AMIRI/Amiri MA Monogram Skinny Jeans 'Light Blue'.jpg" },
+      { brand: 'Amiri', name: 'MX1 Distressed Jeans', color: 'Light Wash Blue', price: 350, image: "AMIRI/Amiri MX1 Light Wash Distressed Jeans 'Blue'.jpg" },
+      { brand: 'Anti Social Social Club', name: 'Mind Games Hoodie', color: 'Black', price: 450, image: "ANTI-SOCIAL-SOCIAL-CLUB/Anti Social Social Club Mind Games Hoodie 'Black'.jpg" },
+      { brand: 'Anti Social Social Club', name: 'Options Hoodie', color: 'Black', price: 450, image: "ANTI-SOCIAL-SOCIAL-CLUB/Anti Social Social Club Options Hoodie 'Black'.jpg" },
+      { brand: 'Balenciaga', name: 'Heavy Metal Logo Hoodie', color: 'Black', price: 450, image: "BALENCIAGA/Balenciaga Heavy Metal Logo Hoodie 'Black'.jpg" },
+      { brand: 'Balenciaga', name: 'Runner Sneaker', color: 'Multicolor', price: 500, image: 'BALENCIAGA/Balenciaga Runner Sneaker - Edition Multicolore.jpg' },
+      { brand: 'Balmain', name: 'Paris Logo Print Hoodie', color: 'Black', price: 450, image: "Balmain Paris Logo Print Hoodie 'Black'.jpg" },
+      { brand: 'Burberry', name: 'Vintage Check Stripe Zip-Up Hoodie', color: 'Black', price: 450, image: "Burberry/Burberry Vintage Check Stripe Zip-Up Hoodie 'Black'.jpg" },
+      { brand: 'Canada Goose', name: 'Chilliwack Bomber Jacket', color: 'Black', price: 750, image: "Canada Goose/Canada Goose Chilliwack Bomber Jacket 'Black'.jpg" },
+      { brand: 'Canada Goose', name: 'HyBridge Knit Hoody', color: 'Black', price: 450, image: "Canada Goose/Canada Goose HyBridge Knit Hoody 'Black'.png" },
+      { brand: 'Casablanca', name: 'Casa Way Hoodie', color: 'Black', price: 450, image: "CASABLANCA/Casablanca Casa Way Hoodie 'Black'.png" },
+      { brand: 'Casablanca', name: 'Ski Club Hoodie', color: 'Black', price: 450, image: "CASABLANCA/Casablanca Ski Club Hoodie 'Black'.jpg" },
+      { brand: 'Casablanca', name: 'Ski Club Long Sleeve T-Shirt', color: 'Black', price: 280, image: "CASABLANCA/Casablanca Ski Club Long Sleeve T-Shirt 'Black'.jpg" },
+      { brand: 'Celine', name: 'Drawstring Loose Hoodie', color: 'Black', price: 450, image: "Celine/Celine Drawstring Loose Hoodie 'Black'.jpg" },
+      { brand: 'Christian Louboutin', name: 'Louis Flat Strass', color: 'Black', price: 500, image: "Christian Louboutin Louis Flat Strass 'Black'.jpg" },
+      { brand: 'Coach', name: 'Signature Jacquard Windbreaker', color: 'Charcoal Black', price: 750, image: "COACH/Coach Signature Jacquard Windbreaker 'Charcoal Black'.jpg" },
+      { brand: 'Denim Tears', name: 'Cotton Wreath Hoodie', color: 'Black', price: 450, image: "Readymade (Denim Tears)/Denim Tears Cotton Wreath Hoodie 'Black'.jpg" },
+      { brand: 'Dior', name: 'Relaxed Fit Hoodie', color: 'Black CD Icon', price: 450, image: "Dior/Dior Relaxed Fit Hoodie 'Black CD Icon'.jpg" },
+      { brand: 'Fendi', name: 'FF Motif Zip Nylon Jacket', color: 'Brown', price: 750, image: "Fendi FF Motif Zip Nylon Jacket 'Brown'.jpg" },
+      { brand: 'Gallery Dept.', name: 'Flames Logo Hoodie', color: 'Black', price: 450, image: "Gallery Dept. Flames Logo Hoodie 'Black'.jpg" },
+      { brand: 'Jacquemus', name: 'Le Sweatshirt Logo', color: 'Black', price: 450, image: "Jacquemus Le Sweatshirt Logo 'Black'.jpg" },
+      { brand: 'Jordan', name: 'Air Jordan 5 Retro', color: 'Black Metallic', price: 500, image: "Air jordan/Air Jordan 5 Retro 'Black Metallic'.jpg" },
+      { brand: 'Jordan', name: 'Air Jordan 11 Retro', color: 'Cool Grey', price: 500, image: "Air jordan/Air Jordan 11 Retro 'Cool Grey'.png" },
+      { brand: 'Ksubi', name: 'Chitch Jeans', color: 'Black', price: 350, image: "Ksubi Chitch Jeans 'Black'.jpg" },
+      { brand: 'Louis Vuitton', name: 'LV Skate Sneaker', color: 'White Grey', price: 500, image: "Louis Vuitton/Louis Vuitton LV Skate Sneaker 'White Grey'.jpg" },
+      { brand: 'Louis Vuitton', name: 'LV Trainer Sneaker', color: 'Black Monogram', price: 500, image: 'Louis Vuitton/Louis Vuitton LV Trainer Sneaker Black (version cuirdenim noir embossé Monogram avec lacets blancs).jpg' },
+      { brand: 'Maison Margiela / MM6', name: 'MM6 Zip-Up Hoodie', color: 'Black', price: 450, image: "MAISON-MARGIELA/MM6 Maison Margiela Zip-Up Hoodie 'Black'.jpg" },
+      { brand: 'Maison Margiela / MM6', name: 'Upside Down Logo Hoodie', color: 'Black', price: 450, image: "MAISON-MARGIELA/Maison Margiela Upside Down Logo Hoodie 'Black'.jpg" },
+      { brand: 'Moncler', name: 'Cardigan Tricot', color: 'Black', price: 280, image: "MONCLER/Moncler Cardigan Tricot 'Black'.jpg" },
+      { brand: 'Moncler', name: 'Logo Hoodie', color: 'Grey', price: 450, image: "MONCLER/Moncler Logo Hoodie 'Grey'.jpg" },
+      { brand: 'Moncler', name: 'Maya Short Down Jacket', color: 'Black', price: 750, image: "MONCLER/Moncler Maya Short Down Jacket 'Black'.jpg" },
+      { brand: 'Moose Knuckles', name: 'Ballistic Bomber Jacket', color: 'Black', price: 750, image: "MONCLER/Moose Knuckles Ballistic Bomber Jacket 'Black'.jpg" },
+      { brand: 'Nike', name: 'Air Max 95 SP x Corteiz', color: 'Gutta Green', price: 500, image: "Nike/Nike Air Max 95 SP Corteiz 'Gutta Green'.jpg" },
+      { brand: 'Nike', name: 'Air Force 1 Low x CPFM', color: 'Flea Black', price: 500, image: "Cactus Plant Flea Market x Nike Air Force 1 Low 'Flea Black'.jpg" },
+      { brand: 'Nike', name: 'Air VaporMax Plus', color: 'Triple Black', price: 500, image: "Nike/Nike Air VaporMax Plus 'Triple Black'.jpg" },
+      { brand: 'Off-White', name: 'Blur Logo Hoodie', color: 'White', price: 450, image: "OFF-WHITE/Off-White Blur Logo Hoodie 'White'.jpg" },
+      { brand: 'Off-White', name: 'Gradient Arrow Mohair Knit', color: 'Blue White', price: 450, image: "OFF-WHITE/Off-White Gradient Arrow Mohair Knit 'Blue White'.jpg" },
+      { brand: 'Off-White', name: 'Marker Arrows Hoodie', color: 'White', price: 450, image: "OFF-WHITE/Off-White Marker Arrows Hoodie 'White'.jpg" },
+      { brand: 'Off-White', name: 'Out Of Office "For Walking" Sneaker', color: 'Black', price: 500, image: "OFF-WHITE/Off-White Out Of Office For Walking Sneaker 'Black'.jpg" },
+      { brand: 'Off-White', name: 'Vulcanized Low Sneaker', color: 'White Black', price: 500, image: "OFF-WHITE/Off-White Vulcanized Low Sneaker 'White Black'.jpg" },
+      { brand: 'Prada', name: "America's Cup Sneaker", color: 'Blue Grey Mesh', price: 500, image: "Prada America's Cup Sneaker 'Blue Grey Mesh'.jpg" },
+      { brand: 'Stüssy', name: 'Basic Stüssy Hoodie', color: 'Navy', price: 450, image: "Stüssy Basic Stüssy Hoodie 'Navy'.jpg" },
+      { brand: 'YoungLA', name: 'Venom Skull Sleeve Hoodie', color: 'Washed Black', price: 450, image: "YoungLA Venom Skull Sleeve Hoodie 'Washed Black'.jpg" }
+    ];
     const products = [
       { id: 1, name: "Jordan 4 Retro 'Black Cat'", category: 'Sneakers', brand: 'Air Jordan', badge: 'BEST-SELLER', variants: [{ color: 'Black Cat', swatch: '#171717', price: 580, image: 'Air jordan/Jordan 4 Retro Black Cat.jpg' }] },
       { id: 2, name: 'Dior B22 Black Reflective', category: 'Sneakers', brand: 'Dior', badge: 'HYPER RARE', variants: [{ color: 'Black', swatch: '#171717', price: 1290, image: 'Dior/Dior B22 Sneakers.mp4', poster: 'Dior/Dior B30 Sneakers.jpg', media: 'video' }] },
@@ -421,8 +550,8 @@
     }
     function productMedia(product, variant) {
       const label = safeText(product.name);
-      if (variant.media === 'video') return `<video class="product-image h-full w-full object-cover" src="${encodeURI(variant.image)}" poster="${encodeURI(variant.poster)}" muted autoplay loop playsinline aria-label="${label} — ${safeText(variant.color)}"></video>`;
-      return `<img class="product-image h-full w-full object-cover" src="${encodeURI(variant.image)}" alt="${label} — ${safeText(variant.color)}" loading="lazy" onerror="this.onerror=null;this.parentElement.innerHTML='<div class=&quot;grid h-full place-items-center bg-[#1b1b1e] px-4 text-center&quot;><span class=&quot;display text-sm font-semibold text-white/45&quot;>${safeText(product.brand)}</span></div>'" />`;
+      if (variant.media === 'video') return `<video class="product-image block w-full h-full object-contain p-4" src="${encodeURI(variant.image)}" poster="${encodeURI(variant.poster)}" muted autoplay loop playsinline aria-label="${label} — ${safeText(variant.color)}"></video>`;
+      return `<img class="product-image block w-full h-full object-contain p-4" src="${encodeURI(variant.image)}" alt="${label} — ${safeText(variant.color)}" loading="lazy" onerror="this.onerror=null;this.parentElement.innerHTML='<div class=&quot;grid h-full place-items-center bg-white px-4 text-center&quot;><span class=&quot;display text-sm font-semibold text-neutral-500&quot;>${safeText(product.brand)}</span></div>'" />`;
     }
     function renderQuickView() {
       const product = products.find(entry => entry.id === activeQuickViewId);
@@ -543,7 +672,7 @@
         ? `<button class="add-to-cart focus-ring absolute bottom-3 left-3 right-3 hidden h-10 translate-y-2 items-center justify-center gap-2 rounded-full bg-white text-[9px] font-bold uppercase tracking-[.14em] text-black opacity-0 transition-all duration-200 hover:brightness-90 group-hover:translate-y-0 group-hover:opacity-100 md:flex" data-add="${product.id}" aria-label="Ajouter ${safeText(product.name)} ${safeText(variant.color)} au panier">Ajouter au panier <span class="text-base leading-none">+</span></button>`
         : '';
       return `<article class="product-card group min-w-0 cursor-pointer rounded-xl p-3 transition-all duration-300 sm:p-4" data-product-id="${product.id}" tabindex="0" role="button" aria-label="Voir ${safeText(product.name)}${product.availability === 'upcoming' ? ', prochainement disponible' : ''}" style="animation-delay:${Math.min(index * 35, 280)}ms">
-        <div class="product-image-wrap relative aspect-[4/4.7] overflow-hidden rounded-xl bg-neutral-900/50">${productMedia(product, variant)}<span class="product-badge absolute left-2 top-2 max-w-[75%] truncate rounded-full border border-white/15 bg-black/65 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[.08em] backdrop-blur-sm">${safeText(badge)}</span>${product.availability === 'upcoming' ? '' : '<span class="absolute right-2.5 top-2.5 flex items-center gap-1.5 rounded-full bg-black/60 px-2 py-1.5 text-[8px] font-semibold uppercase tracking-wider text-white/75 backdrop-blur-sm"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>En stock</span>'}${addButton}</div>
+        <div class="product-image-wrap relative flex aspect-[4/4.7] items-center justify-center overflow-hidden rounded-xl bg-white">${productMedia(product, variant)}<span class="product-badge absolute left-2 top-2 max-w-[75%] truncate rounded-full border border-white/15 bg-black/65 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[.08em] backdrop-blur-sm">${safeText(badge)}</span>${product.availability === 'upcoming' ? '' : '<span class="absolute right-2.5 top-2.5 flex items-center gap-1.5 rounded-full bg-black/60 px-2 py-1.5 text-[8px] font-semibold uppercase tracking-wider text-white/75 backdrop-blur-sm"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>En stock</span>'}${addButton}</div>
         <div class="product-info px-0 pt-3 sm:pt-4"><p class="product-brand mb-1.5 truncate text-[9px] font-semibold uppercase tracking-[.16em] text-white/40">${safeText(product.brand)}</p><div class="flex min-w-0 items-center justify-between gap-2"><h3 class="product-title line-clamp-2 min-h-[2.5em] min-w-0 flex-1 text-sm font-bold leading-5 text-white/90 sm:text-base">${safeText(product.name)}</h3><span class="product-price shrink-0 text-sm font-bold sm:text-base">${money.format(variant.price)}</span></div><p class="product-category mt-2 text-[9px] uppercase tracking-[.1em] text-white/30">${safeText(product.category)}</p>${variantControls}${sizeControl}${product.availability === 'upcoming' ? '<p class="mt-2 text-[9px] font-semibold uppercase tracking-[.1em] text-white/55">Suivre le drop ↗</p>' : ''}</div>
       </article>`;
     }
@@ -571,6 +700,83 @@
         });
       });
       $('#featuredProductCount').textContent = products.length - upcomingProducts.length;
+    }
+    function renderPreorderProducts() {
+      const preorderGrid = $('#preorderGrid');
+      preorderGrid.innerHTML = preorderProducts.map((product, index) => {
+        const message = `Bonjour Lyans Plug 🔌, je souhaite précommander : ${product.brand} — ${product.name} (${product.color}). Merci de me confirmer le prix, les tailles et la disponibilité.`;
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        const imageUrl = encodeURI(product.image);
+        return `<article class="group min-w-0 cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-[#111113] transition duration-300 hover:-translate-y-1 hover:border-white/25 hover:shadow-2xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" data-preorder-index="${index}" tabindex="0" aria-haspopup="dialog" aria-label="Voir la fiche de ${safeText(product.brand)} ${safeText(product.name)}" style="animation:rise .45s ease both;animation-delay:${Math.min(index * 25, 280)}ms">
+          <div class="relative flex aspect-[4/4.7] items-center justify-center overflow-hidden bg-white">
+            <img class="block w-full h-full object-contain p-4 transition duration-500 group-hover:scale-105" src="${safeText(imageUrl)}" alt="${safeText(`${product.brand} ${product.name} — ${product.color}`)}" loading="lazy" onerror="this.classList.add('hidden');this.nextElementSibling.classList.remove('hidden')" />
+            <div class="hidden h-full w-full flex items-center justify-center bg-white p-4 text-center"><span class="display text-xs font-semibold uppercase tracking-[.12em] text-neutral-500">${safeText(product.brand)}</span></div>
+            <span class="absolute left-2 top-2 rounded-full border border-white/15 bg-black/70 px-2.5 py-1 text-[8px] font-bold uppercase tracking-[.1em] backdrop-blur-sm sm:left-3 sm:top-3 sm:text-[9px]">PRÉCOMMANDE</span>
+          </div>
+          <div class="p-2.5 sm:p-4">
+            <p class="truncate text-[8px] font-semibold uppercase tracking-[.12em] text-white/40 sm:text-[9px] sm:tracking-[.16em]">${safeText(product.brand)}</p>
+            <h3 class="mt-1.5 min-h-[2.6em] text-xs font-semibold leading-4 text-white/90 sm:mt-2 sm:text-sm sm:leading-5">${safeText(product.name)}</h3>
+            <p class="mt-1 mb-2 text-lg font-bold text-white">${safeText(product.price)} $ CAD</p>
+            <p class="mt-1 text-[9px] text-white/45 sm:text-[10px]">${safeText(product.color)}</p>
+            <div class="mt-3 grid grid-cols-2 gap-1.5 sm:mt-4 sm:gap-2">
+              <a class="focus-ring flex min-h-9 items-center justify-center gap-1 rounded-full bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F56040] px-1.5 text-[8px] font-bold uppercase tracking-[.04em] text-white transition hover:opacity-90 sm:min-h-10 sm:gap-1.5 sm:px-2 sm:text-[9px] sm:tracking-[.08em]" href="${INSTAGRAM_DM_URL}" target="_blank" rel="noopener noreferrer" aria-label="Commander ${safeText(product.brand)} ${safeText(product.name)} sur Instagram"><svg class="inline-block h-4 w-4 shrink-0 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" aria-hidden="true"><path d="M224.1 141.1c-43.6 0-78.8 35.3-78.8 78.8s35.3 78.8 78.8 78.8 78.8-35.3 78.8-78.8-35.3-78.8-78.8-78.8zm0 129.7c-28.1 0-50.9-22.8-50.9-50.9s22.8-50.9 50.9-50.9 50.9 22.8 50.9 50.9-22.8 50.9-50.9 50.9zm126.1-122c-2.3-5.2-5.4-9.9-9.2-13.8-3.9-3.9-8.6-7-13.8-9.2-5.4-2.3-11.5-3.5-17.7-3.6-28.1-1.3-112.5-1.3-140.6 0-6.2.1-12.3 1.3-17.7 3.6-5.2 2.3-9.9 5.4-13.8 9.2-3.9 3.9-7 8.6-9.2 13.8-2.3 5.4-3.5 11.5-3.6 17.7-1.3 28.1-1.3 112.5 0 140.6.1 6.2 1.3 12.3 3.6 17.7 2.3 5.2 5.4 9.9 9.2 13.8 3.9 3.9 8.6 7 13.8 9.2 5.4 2.3 11.5 3.5 17.7 3.6 28.1 1.3 112.5 1.3 140.6 0 6.2-.1 12.3-1.3 17.7-3.6 5.2-2.3 9.9-5.4 13.8-9.2 3.9-3.9 7-8.6 9.2-13.8 2.3-5.4 3.5-11.5 3.6-17.7 1.3-28.1 1.3-112.5 0-140.6-.1-6.2-1.3-12.3-3.6-17.7zm-20.7 135.2c-.8 17.2-13 30.8-30.2 31.6-23.7 1.1-94.6 1.1-118.3 0-17.2-.8-29.4-14.4-30.2-31.6-1.1-23.7-1.1-94.6 0-118.3.8-17.2 13-30.8 30.2-31.6 23.7-1.1 94.6-1.1 118.3 0 17.2.8 29.4 14.4 30.2 31.6 1.1 23.7 1.1 94.6 0 118.3zm-39.7-142.1c0 10.2 8.3 18.5 18.5 18.5s18.5-8.3 18.5-18.5-8.3-18.5-18.5-18.5-18.5 8.3-18.5 18.5z"/></svg> Instagram</a>
+              <a class="focus-ring flex min-h-9 items-center justify-center gap-1 rounded-full bg-[#25D366] px-1.5 text-[8px] font-bold uppercase tracking-[.04em] text-white transition hover:bg-[#128C7E] sm:min-h-10 sm:gap-1.5 sm:px-2 sm:text-[9px] sm:tracking-[.08em]" href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" aria-label="Commander ${safeText(product.brand)} ${safeText(product.name)} sur WhatsApp"><svg class="inline-block h-4 w-4 shrink-0 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.149-.197.297-.767.967-.94 1.165-.173.198-.347.223-.644.075-.297-.149-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.262.489 1.694.626.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.946L.057 24l6.303-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.481-8.413z"/></svg> WhatsApp</a>
+            </div>
+          </div>
+        </article>`;
+      }).join('');
+      preorderGrid.querySelectorAll('a[aria-label$="sur Instagram"]').forEach(button => {
+        button.innerHTML = `${INSTAGRAM_ICON_MARKUP}<span>INSTAGRAM</span>`;
+      });
+      preorderGrid.querySelectorAll('[data-preorder-index]').forEach(card => {
+        const openCard = () => openPreorderQuickView(Number(card.dataset.preorderIndex));
+        card.addEventListener('click', event => {
+          if (event.target.closest('a, button, select, input')) return;
+          openCard();
+        });
+        card.addEventListener('keydown', event => {
+          if (event.target === card && (event.key === 'Enter' || event.key === ' ')) {
+            event.preventDefault();
+            openCard();
+          }
+        });
+      });
+      $('#preorderCount').textContent = `${preorderProducts.length} pièces`;
+    }
+    let previousPreorderFocus = null;
+    function openPreorderQuickView(index) {
+      const product = preorderProducts[index];
+      if (!product) return;
+      const image = $('#preorderQuickViewImage');
+      const whatsappMessage = `Bonjour Lyans Plug 🔌, je souhaite précommander : ${product.brand} — ${product.name} (${product.color}) au prix affiché de ${product.price} $ CAD. Merci de confirmer la disponibilité et la livraison.`;
+      previousPreorderFocus = document.activeElement;
+      $('#preorderQuickViewBrand').textContent = product.brand;
+      $('#preorderQuickViewTitle').textContent = product.name;
+      $('#preorderQuickViewColor').textContent = `Couleur : ${product.color}`;
+      $('#preorderQuickViewPrice').textContent = `${product.price} $ CAD`;
+      image.classList.remove('hidden');
+      image.src = encodeURI(product.image);
+      image.alt = `${product.brand} ${product.name} — ${product.color}`;
+      image.onerror = () => image.classList.add('hidden');
+      const instagram = $('#preorderQuickViewInstagram');
+      instagram.href = INSTAGRAM_DM_URL;
+      instagram.innerHTML = `${INSTAGRAM_ICON_MARKUP}<span>Commander sur Instagram</span>`;
+      const whatsapp = $('#preorderQuickViewWhatsApp');
+      whatsapp.href = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`;
+      whatsapp.innerHTML = '<span aria-hidden="true">WhatsApp</span><span aria-hidden="true">↗</span>';
+      $('#preorderQuickViewLayer').classList.add('open');
+      $('#preorderQuickViewLayer').setAttribute('aria-hidden', 'false');
+      $('#preorderQuickViewDialog').setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      $('#preorderQuickViewClose').focus();
+    }
+    function closePreorderQuickView() {
+      $('#preorderQuickViewLayer').classList.remove('open');
+      $('#preorderQuickViewLayer').setAttribute('aria-hidden', 'true');
+      $('#preorderQuickViewDialog').setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      previousPreorderFocus?.focus();
+      previousPreorderFocus = null;
     }
     function cartQuantity() { return cart.reduce((sum, item) => sum + item.quantity, 0); }
     function addToCart(id) {
@@ -719,6 +925,8 @@
     document.querySelectorAll('nav[aria-label="Navigation mobile"] a').forEach(link => link.addEventListener('click', () => playSound('filter')));
     $('#cartOverlay').addEventListener('click', closeCart);
     $('#quickViewBackdrop').addEventListener('click', closeModal);
+    $('#preorderQuickViewBackdrop').addEventListener('click', closePreorderQuickView);
+    $('#preorderQuickViewClose').addEventListener('click', closePreorderQuickView);
     $('#quickViewAdd').addEventListener('click', () => {
       const product = products.find(entry => entry.id === activeQuickViewId);
       if (product?.availability === 'upcoming') {
@@ -746,6 +954,7 @@
     document.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;
       if ($('#orderSummaryLayer').classList.contains('open')) closeOrderSummary();
+      else if ($('#preorderQuickViewLayer').classList.contains('open')) closePreorderQuickView();
       else if ($('#quickViewLayer').classList.contains('open')) closeQuickView();
       else if ($('#cartDrawer').classList.contains('open')) closeCart();
     });
@@ -753,6 +962,7 @@
     populateBrandFilter();
     renderProducts();
     renderUpcomingProducts();
+    renderPreorderProducts();
     renderCart();
     window.setTimeout(() => {
       const splash = $('#appSplash');
